@@ -7,8 +7,8 @@
     <properties>
       <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
       <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/nubulamusic_db?useSSL=false&amp;serverTimezone=UTC"/>
-      <property name="jakarta.persistence.jdbc.user" value="Pruebas"/>
-      <property name="jakarta.persistence.jdbc.password" value="Pruebas.1234"/>
+      <property name="jakarta.persistence.jdbc.user" value="tu-usuario"/>
+      <property name="jakarta.persistence.jdbc.password" value="tu-cotrasenia"/>
       <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
       <property name="hibernate.hbm2ddl.auto" value="update"/>
       <property name="hibernate.show_sql" value="true"/>
