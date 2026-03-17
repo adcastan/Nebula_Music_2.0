@@ -14,11 +14,11 @@ import java.util.List;
 public interface IAbumService {
     void crearAlbum(Album album);
 
-    void actualizarAlbum(Album album);
+    void actualizarAlbum(Album album, Long usuarioLogueadoId);
 
-    void eliminarAlbum(Long id);
+    void eliminarAlbum(Long id, Long usuarioLogueadoId);
 
-    Album obtenerAlbum(Long id);
+    Album obtenerAlbum(Long id, Long usuarioLogueadoId);
 
     List<Album> obtenerAlbumsUsuario(Long usuarioId);
 }
