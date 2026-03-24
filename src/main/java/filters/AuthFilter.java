@@ -41,6 +41,9 @@ public class AuthFilter implements Filter {
       
       boolean loginrequest = path.contains("iniciar-sesion.jsp") || path.contains("registro.jsp") || path.contains("autenticacion");
       
+      boolean apiRequest = path.contains("/api/");
+      
+      
       boolean resourceStaticRequest = path.contains("/assets/") ||path.contains("/img/")|| path.contains("/css/");
       
       if (loggedIn||loginrequest||resourceStaticRequest){
