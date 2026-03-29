@@ -6,6 +6,7 @@ package apirest;
 
 import DTOs.ResponseMessageDTO;
 import DTOs.UsuarioDTO;
+import DTOs.UsuarioRequestDTO;
 import com.mycompany.nubulamusicwebaplication.model.Usuario;
 import com.mycompany.nubulamusicwebaplication.service.IUsuarioService;
 import com.mycompany.nubulamusicwebaplication.service.UsuarioService;
@@ -71,57 +72,157 @@ public class UsuarioServletAPI extends HttpServlet {
                     return;
                 }
 
-                    UsuarioDTO dto = new UsuarioDTO();
-                    dto.setId(usuario.getId());
-                    dto.setNombre(usuario.getNombre());
-                    dto.setCorreo(usuario.getCorreo());
-                    dto.setPseudonimo(usuario.getPseudonimo());
+                UsuarioDTO dto = new UsuarioDTO();
+                dto.setId(usuario.getId());
+                dto.setNombre(usuario.getNombre());
+                dto.setCorreo(usuario.getCorreo());
+                dto.setPseudonimo(usuario.getPseudonimo());
                 JSONMapper.mapper.writeValue(response.getWriter(), dto);
 
             }
 
         } catch (Exception e) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
-                ResponseMessageDTO mensaje = new ResponseMessageDTO();
+            ResponseMessageDTO mensaje = new ResponseMessageDTO();
 
-                mensaje.setSuccess(false);
-                mensaje.setMessage("Mo se encontro el usuario buscado.");
+            mensaje.setSuccess(false);
+            mensaje.setMessage("Mo se encontro el usuario buscado.");
 
-                JSONMapper.mapper.writeValue(response.getWriter(), mensaje);
-            }
-
+            JSONMapper.mapper.writeValue(response.getWriter(), mensaje);
         }
-    
-
-        @Override
-        protected void doPost
-        (HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        }
-
-        @Override
-        protected void doPut
-        (HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        }
-
-        @Override
-        protected void doDelete
-        (HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        }
-
-        /**
-         * Returns a short description of the servlet.
-         *
-         * @return a String containing servlet description
-         */
-        @Override
-        public String getServletInfo
-        
-            () {
-        return "Short description";
-        }// </editor-fold>
 
     }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        ResponseMessageDTO apiResponse = new ResponseMessageDTO();
+
+        try {
+            UsuarioRequestDTO req = JSONMapper.mapper.
+                    readValue(request.getInputStream(), UsuarioRequestDTO.class);
+
+            usuarioService.registrar(
+                    req.getNombre(),
+                    req.getCorreo(),
+                    req.getContrasenia(),
+                    req.getPseudonimo(),
+                    req.getEstado(),
+                    req.getCuenta(),
+                    req.getFechaNacimiento(),
+                    req.isTerminosAceptados()
+            );
+
+            response.setStatus(HttpServletResponse.SC_CREATED);
+
+            apiResponse.setSuccess(true);
+            apiResponse.setMessage("Usuario creado correctamente.");
+
+            JSONMapper.mapper.writeValue(response.getWriter(), apiResponse);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage(e.getMessage());
+
+            JSONMapper.mapper.writeValue(response.getWriter(), apiResponse);
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        ResponseMessageDTO apiResponse = new ResponseMessageDTO();
+        try {
+
+            String pathInfo = request.getPathInfo();
+            List<Usuario> usuarios = usuarioService.listarTodos();
+
+            if (pathInfo == null || pathInfo.equals("/")) {
+                throw new IllegalArgumentException("El id es obligatorio");
+            }
+
+            Long id = Long.parseLong(pathInfo.substring(1));
+
+            UsuarioRequestDTO req = JSONMapper.mapper
+                    .readValue(request.getInputStream(), UsuarioRequestDTO.class);
+            Usuario usuario = new Usuario();
+            usuario.setId(id);
+            usuario.setNombre(req.getNombre());
+            usuario.setCorreo(req.getCorreo());
+            usuario.setPseudonimo(req.getPseudonimo());
+            usuario.setEstado(req.getEstado());
+            usuario.setCuenta(req.getCuenta());
+            usuario.setFechaNacimiento(req.getFechaNacimiento());
+            JSONMapper.mapper.writeValue(response.getWriter(), usuario);
+
+            usuarioService.actualizarUsuario(usuario);
+
+            apiResponse.setSuccess(true);
+            apiResponse.setMessage("Usuario actualizado exitosamente");
+
+            JSONMapper.mapper.writeValue(response.getWriter(), apiResponse);
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage(e.getMessage());
+            JSONMapper.mapper.writeValue(response.getWriter(), apiResponse);
+        }
+
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        ResponseMessageDTO apiResponse = new ResponseMessageDTO();
+
+        try {
+            String pathInfo = request.getPathInfo();
+
+            if (pathInfo == null || pathInfo.equals("/")) {
+                throw new IllegalArgumentException("El id es obligatorio");
+            }
+            Long id = Long.parseLong(pathInfo.substring(1));
+
+            usuarioService.eliminarUsuario(id);
+            apiResponse.setSuccess(true);
+            apiResponse.setMessage("Usuario eliminado exitosamente");
+
+            JSONMapper.mapper.writeValue(response.getWriter(), apiResponse);
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+            apiResponse.setSuccess(false);
+            apiResponse.setMessage(e.getMessage());
+            JSONMapper.mapper.writeValue(response.getWriter(), apiResponse);
+
+        }
+
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+}
