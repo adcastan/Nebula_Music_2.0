@@ -4,6 +4,7 @@
  */
 package filters;
 
+import com.mycompany.nubulamusicwebaplication.util.JWTUtil;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -25,32 +26,56 @@ import jakarta.servlet.http.HttpSession;
  */
 @WebFilter(filterName = "AuthFilter", urlPatterns = {"/*"})
 public class AuthFilter implements Filter {
-    
-  @Override
-  public void doFilter(ServletRequest request, ServletResponse response, 
-          FilterChain chain) throws IOException, ServletException
-  {
-      HttpServletRequest req = (HttpServletRequest) request;
-      HttpServletResponse rep = (HttpServletResponse) response;
-      
-      String path = req.getRequestURI();
-      
-      HttpSession sesion=req.getSession(false);
-      
-      boolean loggedIn= (sesion!=null && sesion.getAttribute("usuario")!=null);
-      
-      boolean loginrequest = path.contains("iniciar-sesion.jsp") || path.contains("registro.jsp") || path.contains("autenticacion");
-      
-      boolean apiRequest = path.contains("/api/");
-      
-      
-      boolean resourceStaticRequest = path.contains("/assets/") ||path.contains("/img/")|| path.contains("/css/");
-      
-      if (loggedIn||loginrequest||resourceStaticRequest){
-          chain.doFilter(request, response);
-      }else{
-          rep.sendRedirect(req.getContextPath()+"/views/auth/iniciar-sesion.jsp");
-      }
-      
-  }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        String path = req.getRequestURI();
+
+        String authHeader = req.getHeader("Authorization");
+        boolean tokenValido = false;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                String usuario = JWTUtil.validateToken(token);
+                req.setAttribute("usuario", usuario);
+                tokenValido = true;
+            } catch (Exception e) {
+                tokenValido = false;
+            }
+        }
+
+        HttpSession sesion = req.getSession(false);
+        boolean loggedIn = (sesion != null && sesion.getAttribute("usuario") != null);
+        boolean loginRequest = path.contains("iniciar-sesion.jsp") || path.contains("registro.jsp") || path.contains("autenticacion") || path.contains("/api/");
+        boolean apiRequest = path.contains("/api/");
+        boolean resourceStaticRequest = path.contains("/assets/") || path.contains("/img/") || path.contains("/css/");
+        boolean tyc = path.endsWith("tyc.jsp");
+
+        if (loginRequest || resourceStaticRequest || tyc) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        if(apiRequest){
+            if(!tokenValido){
+                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                res.getWriter().write("No autorizado");
+                return;
+            }
+            
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        if (loggedIn) {
+            chain.doFilter(request, response);
+        } else {
+            res.sendRedirect(req.getContextPath() + "/views/auth/iniciar-sesion.jsp");
+        }
+    }
 }

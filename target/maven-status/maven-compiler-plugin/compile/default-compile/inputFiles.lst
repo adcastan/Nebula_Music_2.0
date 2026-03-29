@@ -7,6 +7,8 @@ C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\com\mycompany\
 C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\com\mycompany\nubulamusicwebaplication\resources\JakartaEE10Resource.java
 C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\com\mycompany\nubulamusicwebaplication\service\AlbumService.java
 C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\dao\IAlbumDAO.java
+C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\DTOs\UsuarioRequestDTO.java
+C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\com\mycompany\nubulamusicwebaplication\util\JWTUtil.java
 C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\com\mycompany\nubulamusicwebaplication\controller\RegistroServlet.java
 C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\com\mycompany\nubulamusicwebaplication\service\IUsuarioService.java
 C:\Users\Adrián\Documentos\Github\Nebula_Music_2.0\src\main\java\com\mycompany\nubulamusicwebaplication\JakartaRestConfiguration.java
